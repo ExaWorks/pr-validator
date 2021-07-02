@@ -75,6 +75,15 @@ is_only_child() {
     return $(git rev-list --no-walk --count --merges "$@")
 }
 
+#  Return zero if commit is a merge commit (more than one parent)
+is_merge_commit() {
+    if ! is_only_child $1; then
+        log "$1 appears to be a merge commit"
+        return 0
+    fi
+    return 1
+}
+
 #  Return zero if commit appears to be labeled a fixup or squash commit
 is_fixup_commit() {
     if git show -s --format=%s $1 | egrep -q 'fixup|squash'; then
@@ -124,10 +133,15 @@ check_commit() {
 
     # First check for errors:
     if is_fixup_commit $sha || \
-       subject_length_exceeds 70 $sha || \
-       body_line_length_exceeds 78 $sha; then
-        symbol="$(notok)"
-        result=1
+        subject_length_exceeds 70 $sha || \
+        body_line_length_exceeds 78 $sha; then
+        if is_merge_commit $sha; then
+            # hard to control merge commit subject lengths, exempt them
+            symbol="$(warning)"
+        else
+            symbol="$(notok)"
+            result=1
+        fi
     else
         # No errors, check warnings:
         loglevel="warn"
