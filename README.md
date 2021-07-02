@@ -4,7 +4,7 @@ Simple GitHub action to prevent accidental merge of PRs with
 invalid commits. Currently, invalid commits include
 
  * Commits with `fixup` or `squash` in the subject
- * Merge commits
+ * Commits with subjects or body that are too long
 
 To add to a project, add the following to a GitHub workflow `.yml` file:
 
@@ -20,5 +20,5 @@ jobs:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
     - run: git fetch origin master
-    - uses: flux-framework/pr-validator@master
+    - uses: exaworks/pr-validator@master
 ```

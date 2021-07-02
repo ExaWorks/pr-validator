@@ -3,8 +3,8 @@
 #  Simple PR commit validator.
 #
 #  Exit with nonzero status if any PR commits (commits between the current
-#   branch and origin/master do not validate, e.g. are themselves merge
-#   commits, or have the word "fixup" or "squash" in the commit subect, etc.
+#   branch and origin/master do not validate, e.g. have the word "fixup" or
+#   "squash" in the commit subject, etc.
 #
 #  Usage: check-pr-commits.sh [upstream ref]
 #
@@ -75,15 +75,6 @@ is_only_child() {
     return $(git rev-list --no-walk --count --merges "$@")
 }
 
-#  Return zero if commit is a merge commit (more than one parent)
-is_merge_commit() {
-    if ! is_only_child $1; then
-        log "$1 appears to be a merge commit"
-        return 0
-    fi
-    return 1
-}
-
 #  Return zero if commit appears to be labeled a fixup or squash commit
 is_fixup_commit() {
     if git show -s --format=%s $1 | egrep -q 'fixup|squash'; then
@@ -133,7 +124,6 @@ check_commit() {
 
     # First check for errors:
     if is_fixup_commit $sha || \
-       is_merge_commit $sha || \
        subject_length_exceeds 70 $sha || \
        body_line_length_exceeds 78 $sha; then
         symbol="$(notok)"
