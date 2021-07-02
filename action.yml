@@ -1,4 +1,4 @@
-name: flux PR validator
+name: Exaworks PR validator
 description: validate PR commits
 runs:
   using: 'docker'
